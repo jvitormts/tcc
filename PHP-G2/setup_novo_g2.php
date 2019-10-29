@@ -4,21 +4,22 @@
     // conectar ao MySql
     require('conectar.php');
 
+
     // Verificar o Banco de Dados etec_tcc
-    if (mysql_select_db("etec_tcc")) 
+    if ($conexao->select_db("etec_tcc"))
 	   { echo "Banco de dados etec_tcc ja existe!";
-         mysql_select_db("etec_tcc") or die ("<br>Falha na seleção do Bando de Dados etec_tcc"); }
+           $conexao->select_db("etec_tcc") or die ("<br>Falha na seleção do Bando de Dados etec_tcc"); }
     else	   
-	   { mysql_query("CREATE DATABASE etec_tcc") or die ("<br>Falha na Criação do BD etec_tcc");
-         mysql_select_db("etec_tcc") or die ("<br>Falha na seleção do Bando de Dados etec_tcc");
+	   { mysqli_query($conexao,"CREATE DATABASE etec_tcc") or die ("<br>Falha na Criação do BD etec_tcc");
+         mysqli_select_db($conexao,"etec_tcc") or die ("<br>Falha na seleção do Bando de Dados etec_tcc");
 		 echo "<br>Banco de dados etec_tcc criado com sucesso!"; }
 
     //Apagar tabelas
-	    mysql_query("DROP TABLE g2_anunciantes");
-		mysql_query("DROP TABLE g2_veiculos");
+	    mysqli_query($conexao,"DROP TABLE g2_anunciantes");
+		mysqli_query($conexao,"DROP TABLE g2_veiculos");
         
 	// --- Criar a tabela anunciantes
-    mysql_query("CREATE TABLE g2_anunciantes (id_cpf varchar(011) NOT NULL,
+    mysqli_query($conexao,"CREATE TABLE g2_anunciantes (id_cpf varchar(011) NOT NULL,
                                               nome   varchar(080) NOT NULL,
                                               email  varchar(080) NOT NULL,
                                               numcel varchar(020) NOT NULL,
@@ -30,7 +31,7 @@
     echo "<br>Tabela g2_anunciantes Criada";
 
     // --- Criar a tabela veiculos
-    mysql_query("CREATE TABLE g2_veiculos (id_placa   varchar(010) NOT NULL,
+    mysqli_query($conexao,"CREATE TABLE g2_veiculos (id_placa   varchar(010) NOT NULL,
 	                                       id_cpf     varchar(011) NOT NULL,
                                            marca      varchar(040) NOT NULL,
                                            modelo     varchar(040) NOT NULL,

@@ -37,9 +37,12 @@
 							<li>
 								<a href="servicos.html">Shop</a>
 							</li>
-							<li class="active">
+							<li class="">
 								<a href="cadastrar.php">Cadastrar</a>
 							</li>
+                            <li class="active">
+                                <a href="cadastrar_carro.php">Cadastrar carro</a>
+                            </li>
 							<li>
 								<a href="login.php">Login</a>
 							</li>
@@ -60,7 +63,7 @@
 
       <!--FORMULÁRIO DE CADASTRO-->
       <div id="cadastrocarro">
-        <form method="post" action=""> 
+        <form enctype="multipart/form-data" action="cadastrar_carro.php" method="POST">
           <h1>Cadastro Veículo</h1> 
           
           <p> 
@@ -102,6 +105,10 @@
             <label for="situacao">Situação:</label>
             <input id="situacao" name="situacao" required="required" type="text" placeholder="digite a situação do veículo"/>
           </p>
+            <p>
+                <label for="img_carro">Imagem:</label>
+                <input id="img_carro" name="img_carro" required="required" type="file"/>
+            </p>
          
 
           <p> 
@@ -195,9 +202,9 @@
 </body>
 
 
-<?php 
+<?php
 
-	if (isset($_POST["submit"])) {
+    if (isset($_POST["submit"])) {
 	 	$id_placa=$_POST["id_placa"];
 	 	$id_cpf=$_POST["id_cpf"];
 	 	$marca=$_POST["marca"];
@@ -207,14 +214,46 @@
 	 	$preco=$_POST["preco"];
 	 	$situacao=$_POST["situacao"];
 
-	 		mysql_connect("localhost","root","") or die(mysql_error());
-	 		mysql_select_db("etec_tcc");
 
-	 	$query="INSERT INTO g2_veiculos values ('$id_placa','$id_cpf','$marca','$modelo','$anofab','$anomod','$preco','$situacao')";
+        //Info sobre a imagem
+        $fotoNome = ($_FILES['img_carro']['name']);
+        $fotoTmpName = ($_FILES['img_carro']['tmp_name']);
+        $fotoSize = ($_FILES['img_carro']['size']);
+        $fotoError = ($_FILES['img_carro']['error']);
+        $fotoType = ($_FILES['img_carro']['type']);
+        //-------------------------//
+
+        //Pegando extensao do arquivo
+        $FileExt = explode('.',$fotoNome);
+        $fileActualExt = strtolower(end($FileExt));
+
+        //Permissao de ext
+        $allowed = array('jpg','jpeg','png');
+        if (in_array($fileActualExt,$allowed)) {
+            if ($fotoError === 0){
+                if($fotoSize < 100000){
+                    $newfotoName = uniqid('',true).".".$fileActualExt;
+                    $target = 'carros/'.$newfotoName;
+                    move_uploaded_file($fotoTmpName,$target);
+                    //header("Location:index.php?uploadsucces");
+                }else{
+                    echo "Tamanho de arquivo nao permitido !";
+                }
+            }else{
+                echo "Existe um erro no arquivo subido";
+            }
+        }else{
+            echo  "Este tipo nao é permitido";
+        };
+
+        $conexao = mysqli_connect("localhost","root","root") or die(mysqli_error($conexao));
+        $conexao->select_db("etec_tcc");
+
+	 	$query="INSERT INTO g2_veiculos values ('$id_placa','$id_cpf','$marca','$modelo','$anofab','$anomod','$preco','$situacao','$newfotoName')";
 	 	
-	 	mysql_query($query) or die (mysql_error());
+	 	mysqli_query($conexao,$query) or die (mysqli_error($conexao));
 	 	
-	 	if (mysql_query($query))
+	 	if (mysqli_query($conexao,$query))
 
 	 	{
 	 	  print("<script>alert(\"Cadastro não realizado com sucesso.\")</script>");
